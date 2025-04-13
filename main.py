@@ -1,41 +1,29 @@
-# -*- coding: utf-8 -*-
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import requests
-import xmltodict
-import urllib3
-
-# SSL 경고 비활성화 (테스트 환경 한정)
-urllib3.disable_warnings()
 
 app = FastAPI()
 
 @app.get("/insurance")
 def get_insurance_data(
-    opaBoheomFg: str = "2",  # 1: 산재보험, 2: 고용보험
-    pageNo: int = 1,
-    numOfRows: int = 3,
-    v_saeopjaDrno: str = None
+    opaBoheomFg: str = Query(..., description="1: 산재, 2: 고용"),
+    v_saeopjaDrno: str = Query(None, description="사업자등록번호")
 ):
-    serviceKey = "iKOpfM3zIpKL5tQ/SHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo/sUJ/3+jdWEmvDLbNUZs8kY6QNzdhZs+eE/w=="
-    base_url = "http://apis.data.go.kr/B490001/gySjbPstateInfoService/getGySjBoheomBsshItem"  # HTTPS → HTTP
+    base_url = "https://apis.data.go.kr/B490001/gySjbPstateInfoService/getGySjBoheomBsshItem"
+    service_key = "iKOpfM3zIpKL5tQ/SHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo/sUJ/3+jdWEmvDLbNUZs8kY6QNzdhZs+eE/w=="
 
     params = {
-        "serviceKey": serviceKey,
+        "serviceKey": service_key,
         "opaBoheomFg": opaBoheomFg,
-        "pageNo": pageNo,
-        "numOfRows": numOfRows
+        "numOfRows": 3,
+        "pageNo": 1
     }
 
     if v_saeopjaDrno:
         params["v_saeopjaDrno"] = v_saeopjaDrno
 
     try:
-        response = requests.get(base_url, params=params, verify=False)  # SSL 검증 비활성화
+        response = requests.get(base_url, params=params, timeout=10)
         response.raise_for_status()
-        data = xmltodict.parse(response.content)
-        return data
+        return response.text  # XML 그대로 반환 (첫 연결 확인 목적)
     except Exception as e:
-        return {
-            "error": str(e),
-            "message": "공공데이터포털 요청 중 문제가 발생했습니다."
-        }
+        return {"error": str(e), "message": "공공데이터포털 요청 중 문제가 발생했습니다."}
