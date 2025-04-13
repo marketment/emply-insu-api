@@ -22,5 +22,11 @@ def get_insurance_data(
         params["v_saeopjaDrno"] = v_saeopjaDrno
 
     try:
-        # 🔒 SSL 검증 비활성화 (임시
+        # 🔒 SSL 검증 비활성화
+        response = requests.get(base_url, params=params, verify=False, timeout=10)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        return {"error": str(e), "message": "공공데이터포털 요청 중 문제가 발생했습니다."}
+
 
