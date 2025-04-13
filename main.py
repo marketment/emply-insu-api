@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Query
-import requests
+import httpx
 
 app = FastAPI()
 
@@ -9,8 +9,7 @@ def get_insurance_data(
     v_saeopjaDrno: str = Query(None, description="사업자등록번호")
 ):
     base_url = "https://apis.data.go.kr/B490001/gySjbPstateInfoService/getGySjBoheomBsshItem"
-   service_key = "iKOpfM3zIpKL5tQ%2FSHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo%2FsUJ%2F3%2BjdWEmvDLbNUZs8kY6QNzdhZs%2BeE%2Fw%3D%3D"
-
+    service_key = "iKOpfM3zIpKL5tQ%2FSHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo%2FsUJ%2F3%2BjdWEmvDLbNUZs8kY6QNzdhZs%2BeE%2Fw%3D%3D"
 
     params = {
         "serviceKey": service_key,
@@ -23,8 +22,9 @@ def get_insurance_data(
         params["v_saeopjaDrno"] = v_saeopjaDrno
 
     try:
-        # 🔒 SSL 검증 비활성화
-        response = requests.get(base_url, params=params, verify=False, timeout=10)
+        # httpx로 SSL 우회
+        with httpx.Client(verify=False, timeout=10.0) as client:
+            response = client.get(base_url, params=params)
         response.raise_for_status()
         return response.text
     except Exception as e:

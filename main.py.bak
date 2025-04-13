@@ -9,7 +9,8 @@ def get_insurance_data(
     v_saeopjaDrno: str = Query(None, description="사업자등록번호")
 ):
     base_url = "https://apis.data.go.kr/B490001/gySjbPstateInfoService/getGySjBoheomBsshItem"
-    service_key = "iKOpfM3zIpKL5tQ/SHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo/sUJ/3+jdWEmvDLbNUZs8kY6QNzdhZs+eE/w=="
+   service_key = "iKOpfM3zIpKL5tQ%2FSHLRwuSj4Odbz2JaoWdkLiNdNSKr6jD3wo%2FsUJ%2F3%2BjdWEmvDLbNUZs8kY6QNzdhZs%2BeE%2Fw%3D%3D"
+
 
     params = {
         "serviceKey": service_key,
